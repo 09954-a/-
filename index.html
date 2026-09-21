@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 STUDY HUB - ผู้ช่วยจัดการชีวิตนักเรียนอัจฉริยะ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+            padding-bottom: 90px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Gamification Bar */
+        .gamify-card {
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .gamify-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: #ffffff;
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Card Layout */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Dashboard Grid */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-box span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-box h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-top: 5px;
+        }
+
+        /* Smart Priority Box */
+        .priority-alert {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 15px;
+        }
+
+        .priority-alert h4 {
+            color: var(--danger);
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        /* Form Controls */
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-color);
+            color: var(--text-main);
+            outline: none;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+        }
+        .btn:hover { background: var(--primary-hover); }
+
+        /* Task Items */
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-color);
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+        }
+
+        .task-info h4 { font-size: 0.95rem; }
+        .task-info p { font-size: 0.75rem; color: var(--text-secondary); }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge.high { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .badge.medium { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge.low { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+
+        /* Timer */
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+ .timer-btns { display: flex; gap: 10px; }
+
+        /* View Sections Control */
+        .view-section { display: none; }
+        .view-section.active-view { display: block; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .dash-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div class="container">
+        <header>
+            <div>
+                <h1>🎓 STUDY HUB</h1>
+                <p>ผู้ช่วยจัดการชีวิตนักเรียนในที่เดียว</p>
+            </div>
+            <button class="btn" style="width: auto; padding: 8px 12px; font-size: 0.8rem;" onclick="toggleTheme()">🌓 ธีม</button>
+        </header>
+
+        <!-- Gamification Level & XP Bar -->
+        <div class="gamify-card">
+            <div class="gamify-header">
+                <div>
+                    <h3 id="userLevel">⭐ LEVEL 1</h3>
+                    <p style="font-size: 0.8rem; opacity: 0.9;" id="streakText">🔥 Study Streak: 0 วันต่อเนื่อง</p>
+                </div>
+                <div style="text-align: right;">
+                    <span id="xpText" style="font-weight: 600;">0 / 100 XP</span>
+                </div>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="xpProgress"></div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 1: HOME / DASHBOARD ================= -->
+        <div id="view-home" class="view-section active-view">
+            <div class="dash-grid">
+                <div class="stat-box">
+                    <span>งานทั้งหมด</span>
+                    <h3 id="statTotal">0</h3>
+                </div>
+                <div class="stat-box">
+                    <span>ต้องส่งวันนี้</span>
+                    <h3 id="statToday" style="color: var(--danger);">0</h3>
+                </div>
+                <div class="stat-box">
+                    <span>เสร็จแล้ว</span>
+                    <h3 id="statDone" style="color: var(--success);">0</h3>
+                </div>
+                <div class="stat-box">
+                    <span>แต้มสะสม</span>
+                    <h3 id="statPoints" style="color: var(--warning);">0</h3>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🚨 Smart Priority (งานด่วนที่ควรทำ)</h2>
+                <div id="smartPriorityContainer">
+                    <p style="color: var(--text-secondary); font-size: 0.85rem;">ยอดเยี่ยม! ไม่มีงานค้างด่วนในตอนนี้ 🎉</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📝 เพิ่มงานใหม่</h2>
+                <input type="text" id="taskTitle" placeholder="ชื่องาน (เช่น รายงานภูมิศาสตร์)">
+                <div class="form-row">
+                    <select id="taskSubject">
+                        <option value="🌏 ภูมิศาสตร์">🌏 ภูมิศาสตร์</option>
+                        <option value="📚 คณิตศาสตร์">📚 คณิตศาสตร์</option>
+                        <option value="🧪 เคมี">🧪 เคมี</option>
+                        <option value="🧬 ชีววิทยา">🧬 ชีววิทยา</option>
+                        <option value="✨ วิชาอื่นๆ">✨ วิชาอื่นๆ</option>
+                    </select>
+                    <input type="date" id="taskDate">
+                </div>
+                <div class="form-row">
+                    <select id="taskPriority">
+                        <option value="high">🔴 ความสำคัญ: สูง</option>
+                        <option value="medium" selected>🟡 ความสำคัญ: ปานกลาง</option>
+                        <option value="low">🟢 ความสำคัญ: ต่ำ</option>
+                    </select>
+                    <button class="btn" onclick="addNewTask()">+ เพิ่มงานเข้าสู่ระบบ</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📋 รายการงานทั้งหมด</h2>
+                <div id="taskListContainer">
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; text-align: center; padding: 20px;">ยังไม่มีงานในระบบ ลองเพิ่มงานด้านบนเลย!</p>
+                </div>
+            </div>
+        </div>   <!-- ================= VIEW 2: CALENDAR ================= -->
+        <div id="view-calendar" class="view-section">
+            <div class="card">
+                <h2>📅 ปฏิทินและเลือกดูงานตามวันที่</h2>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">เลือกวันที่ต้องการตรวจสอบงานที่ต้องส่ง:</p>
+                <input type="date" id="calendarFilterDate" onchange="filterTasksByDate()">
+                <div id="calendarFilteredTasks" style="margin-top: 15px;">
+                    <p style="color: var(--text-secondary); font-size: 0.85rem;">กรุณาเลือกวันที่ด้านบนเพื่อดูรายการงาน</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 3: ACHIEVEMENTS & STATS ================= -->
+        <div id="view-achievement" class="view-section">
+            <div class="card">
+                <h2>🏆 ระบบความสำเร็จและสถิติ</h2>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">สรุปผลงานและความพยายามของคุณ:</p>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="task-item">
+                        <span>⭐ เลเวลปัจจุบัน</span>
+                        <strong id="achieveLevel" style="color: var(--primary);">Level 1</strong>
+                    </div>
+                    <div class="task-item">
+                        <span>🔥 Study Streak ต่อเนื่อง</span>
+                        <strong id="achieveStreak" style="color: var(--warning);">0 วัน</strong>
+                    </div>
+                    <div class="task-item">
+                        <span>✅ งานที่ทำสำเร็จทั้งหมด</span>
+                        <strong id="achieveDoneCount" style="color: var(--success);">0 งาน</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VIEW 4: FOCUS MODE ================= -->
+        <div id="view-focus" class="view-section">
+            <div class="card" style="text-align: center;">
+                <h2>⏱️ Focus Mode (โหมดอ่านหนังสือ)</h2>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">จับเวลาอ่านหนังสือแบบ Pomodoro (25 นาที)</p>
+                <div class="timer-display" id="timerDisplay">25:00</div>
+                <div class="timer-btns">
+                    <button class="btn" onclick="startTimer()">▶️ เริ่มจับเวลา</button>
+                    <button class="btn" style="background: var(--border); color: var(--text-main);" onclick="resetTimer()">🔄 รีเซ็ต</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchView('home', this)">🏠 หน้าแรก</button>
+        <button class="nav-item" onclick="switchView('calendar', this)">📅 ปฏิทิน</button>
+        <button class="nav-item" onclick="switchView('achievement', this)">🏆 ความสำเร็จ</button>
+        <button class="nav-item" onclick="switchView('focus', this)">⏱️ โฟกัส</button>
+    </nav>
+
+    <script>
+        // โหลดข้อมูล
+        let tasks = JSON.parse(localStorage.getItem('studyhub_tasks')) || [];
+        let xp = parseInt(localStorage.getItem('studyhub_xp')) || 0;
+        let streak = parseInt(localStorage.getItem('studyhub_streak')) || 1;
+
+        // ฟังก์ชันสลับหน้าจอ (Views) เมื่อกดเมนูด้านล่าง
+        function switchView(viewName, btnElement) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('view-' + viewName).classList.add('active-view');
+            btnElement.classList.add('active');
+
+            if(viewName === 'achievement') {
+                updateAchievementView();
+            }
+        }
+
+        // อัปเดต UI Gamification
+        function updateGamifyUI() {
+            let level = Math.floor(xp / 100) + 1;
+            let currentXpInLevel = xp % 100;
+            document.getElementById('userLevel').textContent = `⭐ LEVEL ${level}`;
+            document.getElementById('xpText').textContent = `${currentXpInLevel} / 100 XP`;
+            document.getElementById('xpProgress').style.width = `${currentXpInLevel}%`;
+            document.getElementById('streakText').textContent = `🔥 Study Streak: ${streak} วันต่อเนื่อง`;
+            document.getElementById('statPoints').textContent = xp;
+        }
+
+        function updateAchievementView() {
+            let level = Math.floor(xp / 100) + 1;
+            let done = tasks.filter(t => t.completed).length;
+            document.getElementById('achieveLevel').textContent = `Level ${level} (${xp} XP)`;
+            document.getElementById('achieveStreak').textContent = `${streak} วันต่อเนื่อง`;
+            document.getElementById('achieveDoneCount').textContent = `${done} งาน`;
+        }
+
+        // สลับธีม
+        function toggleTheme() {
+            const body = document.body;
+            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+        }
+
+        // เพิ่มงาน
+        function addNewTask() {
+            const title = document.getElementById('taskTitle').value;
+            const subject = document.getElementById('taskSubject').value;
+            const date = document.getElementById('taskDate').value;
+            const priority = document.getElementById('taskPriority').value;
+
+            if(!title || !date) {
+                alert('กรุณากรอกชื่องานและวันส่งให้ครบถ้วนครับ!');
+                return;
+            }
+
+            const newTask = {
+                id: Date.now(),
+                title,
+                subject,
+                date,
+                priority,
+                completed: false
+            };
+
+            tasks.push(newTask);
+            saveAndRender();
+            document.getElementById('taskTitle').value = '';
+            xp += 10;
+            updateGamifyUI();
+            alert('เพิ่มงานสำเร็จ! +10 XP 🎉');
+        }
+
+        // ติ๊กงานเสร็จ
+        function toggleTask(id) {
+            tasks = tasks.map(t => {
+                if(t.id === id) {
+                    t.completed = !t.completed;
+                    if(t.completed) {
+                        xp += 20;
+                        alert('ยอดเยี่ยมมาก! ทำงานสำเร็จ +20 XP 🎉');
+                    }
+                }
+                return t;
+            });
+            updateGamifyUI();
+            saveAndRender();
+        }
+
+        // ลบงาน
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRender();
+        }
+
+        // บันทึกและเรนเดอร์ข้อมูลหน้าแรก
+        function saveAndRender() {
+            localStorage.setItem('studyhub_tasks', JSON.stringify(tasks));
+            localStorage.setItem('studyhub_xp', xp);
+            
+            let total = tasks.length;
+            let done = tasks.filter(t => t.completed).length;
+            const todayStr = new Date().toISOString().split('T')[0];
+            let todayCount = tasks.filter(t => t.date === todayStr && !t.completed).length;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statDone').textContent = done;
+            document.getElementById('statToday').textContent = todayCount;
+
+            renderTaskList();
+            renderSmartPriority(todayStr);
+        }// แสดงรายการงาน
+        function renderTaskList() {
+            const container = document.getElementById('taskListContainer');
+            if(tasks.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem; text-align: center; padding: 20px;">ยังไม่มีงานในระบบ ลองเพิ่มงานด้านบนเลย!</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            tasks.forEach(t => {
+                let pText = t.priority === 'high' ? 'สูง' : (t.priority === 'medium' ? 'ปานกลาง' : 'ต่ำ');
+                container.innerHTML += `
+                    <div class="task-item" style="opacity: ${t.completed ? 0.6 : 1}">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" ${t.completed ? 'checked' : ''} onclick="toggleTask(${t.id})" style="width: 20px; height: 20px; cursor: pointer;">
+                            <div class="task-info">
+                                <h4 style="text-decoration: ${t.completed ? 'line-through' : 'none'}">${t.title}</h4>
+                                <p>${t.subject} | กำหนดส่ง: ${t.date}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge ${t.priority}">ความสำคัญ: ${pText}</span>
+                            <button onclick="deleteTask(${t.id})" style="background:none; border:none; color: var(--danger); cursor:pointer; font-size: 0.8rem;">ลบ</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Smart Priority
+        function renderSmartPriority(todayStr) {
+            const priorityContainer = document.getElementById('smartPriorityContainer');
+            const urgentTasks = tasks.filter(t => !t.completed && (t.date === todayStr || t.priority === 'high'));
+
+            if(urgentTasks.length > 0) {
+                let urgent = urgentTasks[0];
+                priorityContainer.innerHTML = `
+                    <div class="priority-alert">
+                        <h4>🚨 ควรทำตอนนี้: ${urgent.title}</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-main);">วิชา: ${urgent.subject} | กำหนดส่ง: ${urgent.date}</p>
+                    </div>
+                `;
+            } else {
+                priorityContainer.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem;">✨ เยี่ยมมาก! ไม่มีงานเร่งด่วนในตอนนี้ ผ่อนคลายได้เลย</p>`;
+            }
+        }
+
+        // กรองงานตามปฏิทิน
+        function filterTasksByDate() {
+            const selectedDate = document.getElementById('calendarFilterDate').value;
+            const container = document.getElementById('calendarFilteredTasks');
+            const matchedTasks = tasks.filter(t => t.date === selectedDate);
+
+            if(matchedTasks.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-secondary); font-size: 0.85rem;">🎉 ไม่มีงานที่ต้องส่งในวันที่ ${selectedDate}</p>`;
+                return;
+            }
+
+            container.innerHTML = `<p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">งานที่ต้องส่งวันที่ ${selectedDate}:</p>`;
+            matchedTasks.forEach(t => {
+                container.innerHTML += `
+                    <div class="task-item">
+                        <div class="task-info">
+                            <h4>${t.title}</h4>
+                            <p>${t.subject} (${t.completed ? 'เสร็จแล้ว ✅' : 'ยังไม่เสร็จ ⏳'})</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Focus Mode Timer
+        let timer = 25 * 60;
+        let timerInterval = null;
+        function startTimer() {
+            if(timerInterval) return;
+            timerInterval = setInterval(() => {
+                if(timer > 0) {
+                    timer--;
+                    let m = Math.floor(timer / 60);
+                    let s = timer % 60;
+                    document.getElementById('timerDisplay').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                } else {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    alert('ยอดเยี่ยม! ครบเวลาโฟกัส 25 นาทีแล้ว (+30 XP)');
+                    xp += 30;
+                    updateGamifyUI();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timer = 25 * 60;
+            document.getElementById('timerDisplay').textContent = "25:00";
+        }
+
+        // เริ่มต้นทำงาน
+        updateGamifyUI();
+        saveAndRender();
+    </script>
+</body>
+</html>
