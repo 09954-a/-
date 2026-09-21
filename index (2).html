@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ร่างกายกำลังพัง - BIOHACK</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b0f19">
+    <style>
+        :root {
+            --primary: #00ffcc;
+            --accent: #ff3366;
+            --bg-dark: #0b0f19;
+            --panel-bg: rgba(18, 24, 38, 0.95);
+            --border-glow: rgba(0, 255, 204, 0.4);
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1a1c29 0%, #0b0f19 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 750px;
+            width: 100%;
+        }
+        .screen {
+            display: none;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            box-sizing: border-box;
+        }
+        .screen.active {
+            display: block;
+        }
+        /* Main Menu */
+        .hero-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+            margin: 10px 0 5px 0;
+        }
+        .hero-subtitle {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--primary);
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+        }
+        .menu-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+        .btn-game {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: #0b0f19;
+            border: none;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 176, 155, 0.4);
+            transition: 0.2s;
+            text-align: center;
+        }
+        .btn-game:hover { transform: scale(1.02); }
+        .btn-game-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 12px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .btn-game-outline:hover { background: var(--primary); color: #0b0f19; }
+
+        /* HUD Bar */
+        .hud-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        /* Simulation Viewport */
+        .sim-box {
+            background: radial-gradient(circle, #2c0b14 0%, #0b0f19 100%);
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        /* Item Inventory Grid inside Game */
+        .inventory-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        } .inv-chip {
+            background: #1f293d;
+            border: 1px solid var(--primary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            color: var(--primary);
+        }
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .action-btn {
+            background: #1f293d;
+            color: white;
+            border: 1px solid #4b5563;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            text-align: left;
+        }
+        .action-btn:hover { border-color: var(--primary); background: #374151; }
+        
+        /* Collection & Map */
+        .collection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .collection-card {
+            background: rgba(25, 32, 48, 0.9);
+            border: 1px solid rgba(0,255,204,0.2);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .msg-box {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: none;
+        }
+        .success { background: rgba(56, 239, 125, 0.2); color: #38ef7d; border: 1px solid #38ef7d; }
+        .error { background: rgba(255, 51, 102, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- 1. MAIN MENU SCREEN -->
+        <div id="screen-menu" class="screen active">
+            <h1 class="hero-title">🧬 ร่างกายกำลังพัง</h1>
+            <div class="hero-subtitle">BIOHACK: SAVE THE BODY, SAVE THE LIFE</div>
+            <div class="menu-grid">
+                <button class="btn-game" onclick="startGame()">🚀 เริ่มต้นภารกิจ (PLAY)</button>
+                <button class="btn-game-outline" onclick="switchScreen('screen-map')">🗺️ เลือกด่าน (BODY MAP)</button>
+                <button class="btn-game-outline" onclick="switchScreen('screen-collection')">🎒 คลังไอเทม (COLLECTION)</button>
+            </div>
+        </div>
+
+        <!-- 2. GAMEPLAY SCREEN -->
+        <div id="screen-game" class="screen">
+            <div class="hud-bar">
+                <span id="hud-stage">📍 STAGE 1: BLOODSTREAM</span>
+                <span id="hud-stats">❤️ HP: 100 | ⚡ ENERGY: 80</span>
+            </div>
+
+            <div class="sim-box">
+                <div id="stage-alert" style="color: var(--accent); font-weight: bold; font-size: 1.1rem; margin-bottom: 5px;">
+                    🚨 ตรวจพบแบคทีเรียรุกรานกระแสเลือด!
+                </div>
+                <p id="stage-desc" style="font-size: 0.85rem; color: #cbd5e1; margin: 0;">
+                    เซลล์เม็ดเลือดแดงกำลังเสียหาย เลือกใช้ไอเทมหรือเครื่องมือตรวจสอบกำจัดเชื้อโรคด่วน!
+                </p>
+            </div>
+
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px;">🎒 ไอเทมที่ครอบครองในตัว:</div>
+            <div class="inventory-strip" id="active-inventory">
+                <span class="inv-chip">🦠 Pathogen Detector</span>
+                <span class="inv-chip">🛡️ Antibody Shield</span>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--primary); margin-bottom: 6px; font-weight: bold;">⚙️ เลือกคำสั่งปฏิบัติการ:</div>
+            <div class="action-grid" id="action-controls">
+                <button class="action-btn" onclick="executeStageAction('correct')">🦠 ใช้ Pathogen Detector ตรวจจับเชื้อโรค</button>
+                <button class="action-btn" onclick="executeStageAction('shield')">🛡️ กาง Antibody Shield ป้องกัน</button>
+                <button class="action-btn" onclick="executeStageAction('wrong')">🧪 ใช้ Enzyme Pack เร่งปฏิกิริยา</button>
+                <button class="action-btn" onclick="executeStageAction('wrong')">💤 ปล่อยทิ้งไว้เฉยๆ</button>
+            </div>
+
+            <div id="game-msg" class="msg-box"></div>
+            
+            <div style="margin-top: 15px; text-align: center;">
+                <button class="btn-game-outline" onclick="switchScreen('screen-menu')" style="padding: 8px 15px; font-size: 0.8rem;">🏠 กลับเมนูหลัก</button>
+            </div>
+        </div><div class="container">
+
+        <!-- 1. MAIN MENU SCREEN -->
+        <div id="screen-menu" class="screen active">
+            <h1 class="hero-title">🧬 ร่างกายกำลังพัง</h1>
+            <div class="hero-subtitle">BIOHACK: SAVE THE BODY, SAVE THE LIFE</div>
+            <div class="menu-grid">
+                <button class="btn-game" onclick="startGame()">🚀 เริ่มต้นภารกิจ (PLAY)</button>
+                <button class="btn-game-outline" onclick="switchScreen('screen-map')">🗺️ เลือกด่าน (BODY MAP)</button>
+                <button class="btn-game-outline" onclick="switchScreen('screen-collection')">🎒 คลังไอเทม (COLLECTION)</button>
+            </div>
+        </div>
+
+        <!-- 2. GAMEPLAY SCREEN -->
+        <div id="screen-game" class="screen">
+            <div class="hud-bar">
+                <span id="hud-stage">📍 STAGE 1: BLOODSTREAM</span>
+                <span id="hud-stats">❤️ HP: 100 | ⚡ ENERGY: 80</span>
+            </div>
+
+            <div class="sim-box">
+                <div id="stage-alert" style="color: var(--accent); font-weight: bold; font-size: 1.1rem; margin-bottom: 5px;">
+                    🚨 ตรวจพบแบคทีเรียรุกรานกระแสเลือด!
+                </div>
+                <p id="stage-desc" style="font-size: 0.85rem; color: #cbd5e1; margin: 0;">
+                    เซลล์เม็ดเลือดแดงกำลังเสียหาย เลือกใช้ไอเทมหรือเครื่องมือตรวจสอบกำจัดเชื้อโรคด่วน!
+                </p>
+            </div>
+
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px;">🎒 ไอเทมที่ครอบครองในตัว:</div>
+            <div class="inventory-strip" id="active-inventory">
+                <span class="inv-chip">🦠 Pathogen Detector</span>
+                <span class="inv-chip">🛡️ Antibody Shield</span>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--primary); margin-bottom: 6px; font-weight: bold;">⚙️ เลือกคำสั่งปฏิบัติการ:</div>
+            <div class="action-grid" id="action-controls">
+                <button class="action-btn" onclick="executeStageAction('correct')">🦠 ใช้ Pathogen Detector ตรวจจับเชื้อโรค</button>
+                <button class="action-btn" onclick="executeStageAction('shield')">🛡️ กาง Antibody Shield ป้องกัน</button>
+                <button class="action-btn" onclick="executeStageAction('wrong')">🧪 ใช้ Enzyme Pack เร่งปฏิกิริยา</button>
+                <button class="action-btn" onclick="executeStageAction('wrong')">💤 ปล่อยทิ้งไว้เฉยๆ</button>
+            </div>
+
+            <div id="game-msg" class="msg-box"></div>
+            
+            <div style="margin-top: 15px; text-align: center;">
+                <button class="btn-game-outline" onclick="switchScreen('screen-menu')" style="padding: 8px 15px; font-size: 0.8rem;">🏠 กลับเมนูหลัก</button>
+            </div>
+        </div>
+
+        <!-- 3. BODY MAP SCREEN -->
+        <div id="screen-map" class="screen">
+            <h2 style="text-align: center; color: var(--primary); margin-top: 0;">🗺️ แผนผังร่างกาย (BODY MAP)</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: 0 auto;">
+                <button class="btn-game-outline" onclick="selectStage(1)">1. 🩸 BLOODSTREAM (กระแสเลือด)</button>
+                <button class="btn-game-outline" onclick="selectStage(2)">2. 🫁 LUNG SYSTEM (ระบบปอดและออกซิเจน)</button>
+                <button class="btn-game-outline" onclick="selectStage(3)">3. 🧠 BRAIN CENTER (ศูนย์กลางสมอง)</button>
+                <button class="btn-game-outline" onclick="selectStage(4)">4. 🧬 DNA STRAND (รหัสพันธุกรรม)</button>
+                <button class="btn-game-outline" style="border-color: var(--accent); color: var(--accent);" onclick="selectStage(5)">5. 🦠 FINAL BOSS (ไวรัสกลายพันธุ์)</button>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn-game-outline" onclick="switchScreen('screen-menu')">⬅️ กลับหน้าหลัก</button>
+            </div>
+        </div>
+
+        <!-- 4. COLLECTION SCREEN (12 ITEMS) -->
+        <div id="screen-collection" class="screen">
+            <h2 style="text-align: center; color: var(--primary); margin-top: 0;">📦 คลังไอเทมทั้งหมด (12 ชิ้น)</h2>
+            <div class="collection-grid">
+                <div class="collection-card"><div style="font-size: 1.5rem;">🩸</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">O₂ Capsule</div><div style="font-size: 0.65rem; color:#a0aec0;">เติมออกซิเจนให้เซลล์</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🔋</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">ATP Core</div><div style="font-size: 0.65rem; color:#a0aec0;">พลังงานใช้สกิล</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🧬</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">DNA Fragment</div><div style="font-size: 0.65rem; color:#a0aec0;">เปิดข้อมูลเซลล์</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🔬</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Bio Scanner</div><div style="font-size: 0.65rem; color:#a0aec0;">สแกนหาความผิดปกติ</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🦠</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Pathogen Detector</div><div style="font-size: 0.65rem; color:#a0aec0;">ตรวจจับสิ่งแปลกปลอม</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🧫</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Cell Repair Kit</div><div style="font-size: 0.65rem; color:#a0aec0;">ซ่อมแซมเซลล์เสียหาย</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🧪</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Enzyme Pack</div><div style="font-size: 0.65rem; color:#a0aec0;">เร่งปฏิกิริยาในเกม</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🛡️</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Antibody Shield</div><div style="font-size: 0.65rem; color:#a0aec0;">ป้องกันสิ่งแปลกปลอม</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">💉</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Medicine Chip</div><div style="font-size: 0.65rem; color:#a0aec0;">ปลดล็อกข้อมูลการรักษา</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🧠</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Neuron Signal</div><div style="font-size: 0.65rem; color:#a0aec0;">เพิ่มส่งสัญญาณประสาท</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">❤️</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Heart Pulse</div><div style="font-size: 0.65rem; color:#a0aec0;">ฟื้นฟูพลังชีวิตตัวละคร</div></div>
+                <div class="collection-card"><div style="font-size: 1.5rem;">🫁</div><div style="font-size: 0.75rem; font-weight:bold; color:var(--primary);">Lung Filter</div><div style="font-size: 0.65rem; color:#a0aec0;">เพิ่มแลกเปลี่ยนแก๊ส</div></div>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                <button class="btn-game-outline" onclick="switchScreen('screen-menu')">⬅️ กลับหน้าหลัก</button>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        let currentStage = 1;
+        let hp = 100;
+        let energy = 80;
+
+        const stageData = {
+            1: {
+                name: "📍 STAGE 1: BLOODSTREAM (กระแสเลือด)",
+                alert: "🚨 แบคทีเรียกำลังโจมตีเซลล์เม็ดเลือด!",
+                desc: "เลือกใช้เครื่องมือตรวจจับหรือกำจัดสิ่งแปลกปลอมในกระแสเลือด",
+                items: ['🦠 Pathogen Detector', '🛡️ Antibody Shield'],
+                controls: `
+                    <button class="action-btn" onclick="executeStageAction('correct')">🦠 ใช้ Pathogen Detector ตรวจจับเชื้อโรค</button>
+                    <button class="action-btn" onclick="executeStageAction('shield')">🛡️ กาง Antibody Shield ป้องกัน</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">🧪 ใช้ Enzyme Pack เร่งปฏิกิริยา</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">💤 ปล่อยทิ้งไว้เฉยๆ</button>
+                `
+            },
+            2: {
+                name: "📍 STAGE 2: LUNG SYSTEM (ระบบปอด)",
+                alert: "🫁 ภาวะออกซิเจนในเลือดต่ำ เซลล์กำลังขาดอากาศ!",
+                desc: "ต้องเติมแก๊สและกรองอากาศเข้าสู่ถุงลมปอด",
+                items: ['🩸 O₂ Capsule', '🫁 Lung Filter'],
+                controls: `
+                    <button class="action-btn" onclick="executeStageAction('correct')">🩸 ใช้ O₂ Capsule เติมออกซิเจน</button>
+                    <button class="action-btn" onclick="executeStageAction('correct')">🫁 ใช้ Lung Filter กรองแก๊ส</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">🔋 ใช้ ATP Core พลังงาน</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">💤 ไม่ทำอะไรเลย</button>
+                `
+            },
+            3: {
+                name: "📍 STAGE 3: BRAIN CENTER (สมอง)",
+                alert: "⚡ กระแสประสาทติดขัด สัญญาณสมองล่ม!",
+                desc: "ใช้พลังงานและกระแสประสาทกู้ระบบสั่งการ",
+                items: ['🔋 ATP Core', '🧠 Neuron Signal'],
+                controls: `
+                    <button class="action-btn" onclick="executeStageAction('correct')">🔋 ใช้ ATP Core เพิ่มพลังงาน</button>
+                    <button class="action-btn" onclick="executeStageAction('correct')">🧠 ใช้ Neuron Signal ส่งสัญญาณ</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">🦠 ใช้ Pathogen Detector</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">💤 ปิดระบบสมอง</button>
+                `
+            },
+            4: {
+                name: "📍 STAGE 4: DNA STRAND (รหัสพันธุกรรม)",
+                alert: "🧬 สาย DNA เกิดการบิดเบี้ยวเสียหาย!",
+                desc: "ใช้ชุดซ่อมแซมและชิ้นส่วน DNA กู้คืนข้อมูลเซลล์",
+                items: ['🧬 DNA Fragment', '🧫 Cell Repair Kit'],
+                controls: `
+                    <button class="action-btn" onclick="executeStageAction('correct')">🧬 ใช้ DNA Fragment เปิดข้อมูล</button>
+                    <button class="action-btn" onclick="executeStageAction('correct')">🧫 ใช้ Cell Repair Kit ซ่อมแซม</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">🩸 ใช้ O₂ Capsule</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">💤 ละทิ้งภารกิจ</button>
+                `
+            },
+            5: {
+                name: "📍 STAGE 5: FINAL BOSS (ไวรัสกลายพันธุ์)",
+                alert: "⚠️ มหาภัยไวรัสกลายพันธุ์กำลังทำลายล้างร่างกาย!",
+                desc: "ผสานพลังไอเทมทั้งหมดเพื่อกู้ชีพร่างกายมนุษย์ครั้งสุดท้าย",
+                items: ['❤️ Heart Pulse', '💉 Medicine Chip', '🔬 Bio Scanner'],
+                controls: `
+                    <button class="action-btn" onclick="executeStageAction('correct')">❤️ ใช้ Heart Pulse ฟื้นพลังชีวิต</button>
+                    <button class="action-btn" onclick="executeStageAction('correct')">💉 ใช้ Medicine Chip ปลดล็อกยา</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">🧪 ใช้ Enzyme Pack เดี่ยวๆ</button>
+                    <button class="action-btn" onclick="executeStageAction('wrong')">💤 ยอมแพ้</button>
+                `
+            }
+        };function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            selectStage(1);
+        }
+
+        function selectStage(stageNum) {
+            currentStage = stageNum;
+            const data = stageData[stageNum];
+            document.getElementById('hud-stage').innerHTML = data.name;
+            document.getElementById('stage-alert').innerHTML = data.alert;
+            document.getElementById('stage-desc').innerHTML = data.desc;
+            
+            // Render Inventory Chips
+            const invHTML = data.items.map(i => `<span class="inv-chip">${i}</span>`).join('');
+            document.getElementById('active-inventory').innerHTML = invHTML;
+
+            // Render Controls
+            document.getElementById('action-controls').innerHTML = data.controls;
+            document.getElementById('game-msg').style.display = 'none';
+
+            switchScreen('screen-game');
+        }
+
+        function executeStageAction(type) {
+            const msg = document.getElementById('game-msg');
+            msg.style.display = 'block';
+
+            if (type === 'correct' || type === 'shield') {
+                msg.className = 'msg-box success';
+                if (currentStage < 5) {
+                    msg.innerHTML = `🎉 ผ่านด่าน Stage ${currentStage} สำเร็จ! กำลังพาไปยังด่านถัดไป...`;
+                    setTimeout(() => {
+                        selectStage(currentStage + 1);
+                    }, 1500);
+                } else {
+                    msg.innerHTML = `🏆 ยอดเยี่ยมที่สุด! คุณพิชิตบอสและกู้ชีพ "ร่างกายกำลังพัง" สำเร็จลุล่วงสมบูรณ์!`;
+                }
+            } else {
+                msg.className = 'msg-box error';
+                hp -= 25;
+                document.getElementById('hud-stats').innerHTML = `❤️ HP: ${hp} | ⚡ ENERGY: ${energy}`;
+                if (hp <= 0) {
+                    msg.innerHTML = `💀 พลังชีวิตหมดลง! ร่างกายล่มสลาย รีสตาร์ทเกมใหม่ใน 2 วินาที...`;
+                    setTimeout(() => {
+                        hp = 100;
+                        selectStage(1);
+                    }, 2000);
+                } else {
+                    msg.innerHTML = `⚠️ เลือกเครื่องมือไม่ถูกต้อง! พลังชีวิตลดลง 25%`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
