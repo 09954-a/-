@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>พยากรณ์อากาศ - ภูพาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #3b5978;
+            color: #ffffff;
+            margin: 0;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .sky-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .cloud-anim {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.22);
+            animation: floatCloud linear infinite;
+        }
+        @keyframes floatCloud {
+            0% { transform: translateX(-150px); }
+            100% { transform: translateX(calc(100vw + 150px)); }
+        }
+        .moon-anim {
+            position: absolute;
+            color: rgba(255, 255, 220, 0.4);
+            animation: floatMoon linear infinite;
+        }
+        @keyframes floatMoon {
+            0% { transform: translateX(-100px) translateY(20px); }
+            100% { transform: translateX(calc(100vw + 100px)) translateY(-20px); }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            position: relative;
+            z-index: 10;
+        }
+        .clickable-card {
+            cursor: pointer;
+            transition: transform 0.1s ease, background 0.2s ease;
+        }
+        .clickable-card:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="sky-bg">
+        <i class="fa-solid fa-cloud cloud-anim text-6xl" style="top: 10%; animation-duration: 25s; animation-delay: 0s;"></i>
+        <i class="fa-solid fa-cloud cloud-anim text-4xl" style="top: 35%; animation-duration: 35s; animation-delay: -10s;"></i>
+        <i class="fa-solid fa-cloud cloud-anim text-5xl" style="top: 60%; animation-duration: 20s; animation-delay: -5s;"></i>
+        <i class="fa-solid fa-moon moon-anim text-5xl hidden" id="moonElement" style="top: 20%; animation-duration: 40s;"></i>
+    </div>
+<header class="flex justify-between items-center p-4 sticky top-0 z-40 bg-transparent">
+        <div class="flex items-center space-x-1.5">
+            <i class="fa-solid fa-location-dot text-sm text-white"></i>
+            <h1 class="text-lg font-normal tracking-wide">ภูพาน</h1>
+        </div>
+        <div id="liveClock" class="text-xs bg-white/20 px-3 py-1.5 rounded-full font-mono backdrop-blur-md">
+            00:00:00 น.
+        </div>
+        <div class="flex space-x-4 text-lg">
+            <i class="fa-solid fa-sliders cursor-pointer"></i>
+            <i class="fa-solid fa-gear cursor-pointer"></i>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto px-4 space-y-4 relative z-10">
+
+        <div id="page-today" class="space-y-4">
+            
+            <div class="text-center pt-2 pb-4">
+                <div class="text-xs text-white/80 mb-1" id="realFeelText">RealFeel® 35°C</div>
+                <div class="text-9xl font-light tracking-tighter mb-1">30°</div>
+                <p class="text-sm font-normal text-white/95 tracking-wide">มีเมฆเป็นส่วนใหญ่</p>
+                <div class="flex justify-center items-center space-x-4 mt-2 text-sm text-white/90">
+                    <span><i class="fa-solid fa-arrow-down text-blue-300"></i> 24°C</span>
+                    <span><i class="fa-solid fa-arrow-up text-red-300"></i> 30°C</span>
+                    <span><i class="fa-solid fa-droplet text-blue-200"></i> 71%</span>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div id="sliderContainer" class="overflow-x-auto no-scrollbar flex space-x-3 snap-x snap-mandatory">
+                    
+                    <div onclick="openModal('โอกาสฝนตก', 'โอกาสที่ฝนจะตกในพื้นที่ภูพานคือ 55%')" class="glass-card p-4 rounded-3xl flex items-center justify-between min-w-full snap-center clickable-card">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-500/30 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-cloud-rain text-blue-200"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-sm">โอกาสฝนตก</h3>
+                                <p class="text-xs text-white/70 mt-0.5">คาดว่าจะมีโอกาสฝนตกประมาณ 55%</p>
+                            </div>
+                        </div>
+                        <span class="text-xs text-white font-medium whitespace-nowrap pl-2">55% ></span>
+                    </div>
+
+                    <div onclick="openModal('คุณภาพอากาศ', 'ดัชนีคุณภาพอากาศ (AQI): ดี (41)')" class="glass-card p-4 rounded-3xl flex items-center justify-between min-w-full snap-center clickable-card">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-teal-500/40 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-wind text-teal-200"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-sm">คุณภาพอากาศดี</h3>
+                                <p class="text-xs text-white/70 mt-0.5">มลพิษทางอากาศมีความเสี่ยงน้อยมาก</p>
+                            </div>
+                        </div>
+                        <div class="relative w-11 h-11 flex items-center justify-center rounded-full border-4 border-teal-400 bg-teal-500/20 text-sm font-semibold">
+                            41
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="glass-card p-4 rounded-3xl">
+                <h3 class="text-xs font-medium text-white/70 mb-3">พยากรณ์ประจำชั่วโมง</h3>
+                <div class="flex justify-between text-center overflow-x-auto space-x-6 no-scrollbar pb-1">
+                    <div class="flex flex-col items-center flex-shrink-0 cursor-pointer" onclick="openModal('1 ชม. หลัง', 'อุณหภูมิ 30°C | ฝนฟ้าคะนองเล็กน้อย')">
+                        <span class="text-xs text-white/70">1 ชม.หลัง</span>
+                        <i class="fa-solid fa-cloud-rain text-2xl my-2.5 text-blue-200"></i>
+                        <span class="text-xs text-white/80">49%</span>
+                        <span class="font-medium text-sm mt-1">30°C</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-shrink-0 cursor-pointer" onclick="openModal('2 ชม. หลัง', 'อุณหภูมิ 30°C | ฝนฟ้าคะนองเล็กน้อย')">
+                        <span class="text-xs text-white/70">2 ชม.หลัง</span>
+                        <i class="fa-solid fa-cloud-rain text-2xl my-2.5 text-blue-200"></i>
+                        <span class="text-xs text-white/80">67%</span>
+                        <span class="font-medium text-sm mt-1">30°C</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-shrink-0 cursor-pointer" onclick="openModal('3 ชม. หลัง', 'อุณหภูมิ 30°C | ฝนฟ้าคะนอง')">
+                        <span class="text-xs text-white/70">3 ชม.หลัง</span>
+                        <i class="fa-solid fa-cloud-rain text-2xl my-2.5 text-blue-200"></i>
+                        <span class="text-xs text-white/80">75%</span>
+                        <span class="font-medium text-sm mt-1">30°C</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-shrink-0 cursor-pointer" onclick="openModal('4 ชม. หลัง', 'อุณหภูมิ 29°C | มีเมฆมาก')">
+                        <span class="text-xs text-white/70">4 ชม.หลัง</span>
+                        <i class="fa-solid fa-cloud text-2xl my-2.5 text-white/80"></i>
+                        <span class="text-xs text-white/80">49%</span>
+                        <span class="font-medium text-sm mt-1">29°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-4 rounded-3xl space-y-3.5">
+                <h3 class="text-xs font-medium text-white/70 mb-1">พยากรณ์อากาศรายวัน</h3>
+                <div onclick="openModal('วันนี้', 'มีฝนตก | ต่ำสุด 24°C / สูงสุด 30°C')" class="flex justify-between items-center text-sm clickable-card py-1"><span class="w-1/3" id="dayLabel1">วันนี้</span><i class="fa-solid fa-cloud-rain text-blue-200 text-center w-1/3"></i><span class="text-right w-1/3">30° / 24°</span></div>
+                <div onclick="openModal('วันพรุ่งนี้', 'มีเมฆเป็นส่วนใหญ่ | ต่ำสุด 24°C / สูงสุด 30°C')" class="flex justify-between items-center text-sm clickable-card py-1"><span class="w-1/3" id="dayLabel2">วันพรุ่งนี้</span><i class="fa-solid fa-cloud text-white/80 text-center w-1/3"></i><span class="text-right w-1/3">30° / 24°</span></div>
+                <div onclick="openModal('วันถัดไป', 'ฝนเล็กน้อย | ต่ำสุด 24°C / สูงสุด 31°C')" class="flex justify-between items-center text-sm clickable-card py-1"><span class="w-1/3" id="dayLabel3">วันถัดไป</span><i class="fa-solid fa-cloud-rain text-blue-200 text-center w-1/3"></i><span class="text-right w-1/3">31° / 24°</span></div>
+                <div onclick="openModal('วันถัดไป', 'พายุฝนฟ้าคะนอง | ต่ำสุด 23°C / สูงสุด 29°C')" class="flex justify-between items-center text-sm clickable-card py-1"><span class="w-1/3" id="dayLabel4">วันถัดไป</span><i class="fa-solid fa-cloud-bolt text-yellow-300 text-center w-1/3"></i><span class="text-right w-1/3">29° / 23°</span></div>
+                <button onclick="switchTab('15days')" class="w-full mt-2 py-2.5 bg-white/10 hover:bg-white/20 rounded-2xl text-sm font-medium transition text-center">ดูพยากรณ์เพิ่มเติมทั้งหมด</button>
+            </div><div class="grid grid-cols-2 gap-3">
+                <div onclick="openModal('ทิศทางและความเร็วลม', 'ความเร็วลม: 9 กม./ชม.')" class="glass-card p-4 rounded-3xl flex flex-col justify-between clickable-card">
+                    <div class="text-xs text-white/70 flex items-center"><i class="fa-solid fa-wind mr-1"></i>ลม</div>
+                    <div class="text-base font-medium mt-3">W 9.0 กม./ชม.</div>
+                </div>
+                <div onclick="openModal('ความชื้นสัมพัทธ์', 'ความชื้นในอากาศ: 71%')" class="glass-card p-4 rounded-3xl flex flex-col justify-between clickable-card">
+                    <div class="text-xs text-white/70 flex items-center"><i class="fa-solid fa-droplet mr-1"></i>ความชื้น</div>
+                    <div class="text-base font-medium mt-3">71%</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="page-hourly" class="space-y-4 hidden">
+            <h2 class="text-lg font-medium">พยากรณ์รายชั่วโมง</h2>
+            <div class="glass-card p-4 rounded-3xl space-y-3 text-sm">
+                <div onclick="openModal('ชั่วโมงนี้', 'อุณหภูมิ 30°C | มีฝนเล็กน้อย')" class="flex justify-between items-center border-b border-white/10 pb-2.5 clickable-card"><span id="hourNowText">ตอนนี้</span><i class="fa-solid fa-cloud-rain text-blue-200"></i><span>30°C ฝนเล็กน้อย</span></div>
+                <div onclick="openModal('ชั่วโมงถัดไป', 'อุณหภูมิ 30°C | มีฝนเล็กน้อย')" class="flex justify-between items-center border-b border-white/10 pb-2.5 clickable-card"><span id="hourPlus1"> +1 ชม.</span><i class="fa-solid fa-cloud-rain text-blue-200"></i><span>30°C ฝนเล็กน้อย</span></div>
+                <div onclick="openModal('ชั่วโมงถัดไป', 'อุณหภูมิ 30°C | มีฝนเล็กน้อย')" class="flex justify-between items-center border-b border-white/10 pb-2.5 clickable-card"><span id="hourPlus2"> +2 ชม.</span><i class="fa-solid fa-cloud-rain text-blue-200"></i><span>30°C ฝนเล็กน้อย</span></div>
+                <div onclick="openModal('ชั่วโมงถัดไป', 'อุณหภูมิ 29°C | ฝนฟ้าคะนอง')" class="flex justify-between items-center border-b border-white/10 pb-2.5 clickable-card"><span id="hourPlus3"> +3 ชม.</span><i class="fa-solid fa-cloud-bolt text-yellow-300"></i><span>29°C ฝนฟ้าคะนอง</span></div>
+                <div onclick="openModal('ชั่วโมงถัดไป', 'อุณหภูมิ 28°C | มีเมฆมาก')" class="flex justify-between items-center clickable-card"><span id="hourPlus4"> +4 ชม.</span><i class="fa-solid fa-cloud text-white/80"></i><span>28°C มีเมฆมาก</span></div>
+            </div>
+        </div>
+
+        <div id="page-15days" class="space-y-4 hidden">
+            <h2 class="text-lg font-medium">พยากรณ์อากาศ 10 วันข้างหน้า</h2>
+            <div class="glass-card p-4 rounded-3xl space-y-3 text-sm" id="forecast10DaysList">
+                </div>
+        </div>
+
+        <div id="page-radar" class="space-y-4 hidden">
+            <h2 class="text-lg font-medium">เรดาร์สภาพอากาศ</h2>
+            <div class="glass-card p-4 rounded-3xl space-y-3">
+                <div onclick="openModal('เรดาร์กลุ่มฝนเรียลไทม์', 'กลุ่มฝนกำลังเคลื่อนตัวเข้าสู่เขตภูพาน')" class="relative w-full h-80 bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center border border-white/10 clickable-card">
+                    <div class="absolute inset-0 opacity-30 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    <div class="absolute w-44 h-44 bg-green-500/50 rounded-full blur-xl animate-pulse"></div>
+                    <div class="absolute w-20 h-20 bg-yellow-400/60 rounded-full blur-md top-10 left-12"></div>
+                    <div class="absolute w-3.5 h-3.5 bg-blue-500 border-2 border-white rounded-full shadow-lg"></div>
+                    <span class="absolute bottom-3 left-3 text-xs text-white/80 bg-black/40 px-2 py-1 rounded">เรดาร์ฝนเรียลไทม์ ภูพาน</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card bg-[#385277] w-full max-w-sm rounded-3xl p-6 space-y-4 shadow-2xl border border-white/20">
+            <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                <h3 id="modalTitle" class="text-lg font-semibold">หัวข้อรายละเอียด</h3>
+                <button onclick="closeModal()" class="text-white/70 hover:text-white text-xl px-2">&times;</button>
+            </div>
+            <p id="modalContent" class="text-sm text-white/90 whitespace-pre-line leading-relaxed">รายละเอียดเชิงลึก...</p>
+            <button onclick="closeModal()" class="w-full py-2.5 bg-white/20 hover:bg-white/30 rounded-2xl text-sm font-medium transition text-center">ปิดหน้าต่าง</button>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 glass-card border-t border-white/10 py-3 px-6 flex justify-around items-center text-xs text-white/70 z-40 bg-[#354f6c]/95">
+        <button onclick="switchTab('today')" id="btn-today" class="nav-btn flex flex-col items-center text-white font-medium">
+            <i class="fa-regular fa-calendar text-xl mb-1"></i>
+            <span>วันนี้</span>
+        </button>
+        <button onclick="switchTab('hourly')" id="btn-hourly" class="nav-btn flex flex-col items-center hover:text-white">
+            <i class="fa-regular fa-clock text-xl mb-1"></i>
+            <span>รายชั่วโมง</span>
+        </button>
+        <button onclick="switchTab('15days')" id="btn-15days" class="nav-btn flex flex-col items-center hover:text-white">
+            <i class="fa-solid fa-calendar-days text-xl mb-1"></i>
+            <span>10 วัน</span>
+        </button>
+        <button onclick="switchTab('radar')" id="btn-radar" class="nav-btn flex flex-col items-center hover:text-white">
+            <i class="fa-solid fa-satellite-dish text-xl mb-1"></i>
+            <span>เรดาร์</span>
+        </button>
+    </nav>
+
+    <script>
+        function switchTab(tabName) {
+            document.getElementById('page-today').classList.add('hidden');
+            document.getElementById('page-hourly').classList.add('hidden');
+            document.getElementById('page-15days').classList.add('hidden');
+            document.getElementById('page-radar').classList.add('hidden');
+
+            document.getElementById('page-' + tabName).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-white', 'font-medium');
+                btn.classList.add('text-white/70');
+            });
+
+            const activeBtn = document.getElementById('btn-' + tabName);
+            if (activeBtn) {
+                activeBtn.classList.add('text-white', 'font-medium');
+                activeBtn.classList.remove('text-white/70');
+            }
+            
+            window.scrollTo(0, 0);
+        }
+
+        function openModal(title, content) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalContent').innerText = content;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // อัปเดตเวลาและวินาทีแบบเรียลไทม์ พร้อมสลับโหมดกลางวัน/กลางคืนอัตโนมัติ
+        function updateRealTimeClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            document.getElementById('liveClock').innerText = `${hours}:${minutes}:${seconds} น.`;
+
+            // ตรวจสอบโหมดกลางคืน (18:00 - 06:00 แสดงดวงจันทร์เคลื่อนที่)
+            const currentHour = now.getHours();
+            const moonEl = document.getElementById('moonElement');
+            if (currentHour < 6 || currentHour >= 18) {
+                if (moonEl) moonEl.classList.remove('hidden');
+            } else {
+                if (moonEl) moonEl.classList.add('hidden');
+            }
+        }
+        setInterval(updateRealTimeClock, 1000);
+        updateRealTimeClock();
+
+        // สร้างวันที่จริงแบบไดนามิกสำหรับแสดงผลรายวัน
+        function generateDynamicDates() {
+            const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            const daysOfWeek = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
+            
+            const today = new Date();
+            
+            // อัปเดตข้อความรายวัน 4 วันแรกหน้าหลัก
+            for (let i = 1; i <= 4; i++) {
+                const targetDate = new Date();
+                targetDate.setDate(today.getDate() + (i - 1));
+                const dateStr = `${targetDate.getDate()} ${months[targetDate.getMonth()]}`;
+                const dayName = daysOfWeek[targetDate.getDay()];
+                
+                const label = document.getElementById(`dayLabel${i}`);
+                if (label) {
+                    if (i === 1) label.innerText = `${dateStr} (วันนี้)`;
+                    else if (i === 2) label.innerText = `${dateStr} (พรุ่งนี้)`;
+                    else label.innerText = `${dateStr} ${dayName}`;
+                }
+            }// สร้างรายการ 10 วันล่วงหน้า
+            const container = document.getElementById('forecast10DaysList');
+            if (container) {
+                let htmlContent = '';
+                for (let i = 0; i < 10; i++) {
+                    const targetDate = new Date();
+                    targetDate.setDate(today.getDate() + i);
+                    const dateStr = `${targetDate.getDate()} ${months[targetDate.getMonth()]}`;
+                    const dayName = daysOfWeek[targetDate.getDay()];
+                    
+                    let dayText = i === 0 ? "วันนี้" : (i === 1 ? "พรุ่งนี้" : dayName);
+                    let weatherDesc = i % 2 === 0 ? "มีฝนตก" : "มีเมฆเป็นส่วนใหญ่";
+                    let tempRange = i % 2 === 0 ? "30° / 24°C" : "31° / 24°C";
+
+                    htmlContent += `
+                        <div onclick="openModal('${dateStr} (${dayText})', '${weatherDesc} | อุณหภูมิ ${tempRange}')" class="flex justify-between items-center ${i < 9 ? 'border-b border-white/15 pb-2.5' : ''} clickable-card">
+                            <span class="w-1/3">${dateStr} (${dayText})</span>
+                            <span class="w-1/3 text-center">${weatherDesc}</span>
+                            <span class="w-1/3 text-right">${tempRange}</span>
+                        </div>
+                    `;
+                }
+                container.innerHTML = htmlContent;
+            }
+
+            // อัปเดตเวลาชั่วโมงปัจจุบันในหน้าพยากรณ์รายชั่วโมง
+            const currentHourNum = today.getHours();
+            const hourNowText = document.getElementById('hourNowText');
+            if (hourNowText) hourNowText.innerText = `${currentHourNum}:00 (ตอนนี้)`;
+            
+            for (let j = 1; j <= 4; j++) {
+                const futureHour = (currentHourNum + j) % 24;
+                const hourEl = document.getElementById(`hourPlus${j}`);
+                if (hourEl) hourEl.innerText = `${String(futureHour).padStart(2, '0')}:00`;
+            }
+        }
+        generateDynamicDates();
+    </script>
+</body>
+</html>
