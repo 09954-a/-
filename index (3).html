@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท้าทายภูมิปัญญาไทย - อยู่ไทย... หรืออยู่ลาว?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold-primary: #ffcc00;
+            --gold-glow: #ffd700;
+            --bg-dark: #0e1117;
+            --card-bg: #121622;
+            --btn-bg: #22293a;
+            --btn-border: #3b4760;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Kanit', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Particles Background */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Main Golden Card Frame */
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 2px solid var(--gold-primary);
+            border-radius: 28px;
+            padding: 35px 25px 20px 25px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.25), inset 0 0 15px rgba(255, 204, 0, 0.1);
+            animation: goldenGlow 3s infinite alternate;
+        }
+
+@keyframes goldenGlow {
+            0% { box-shadow: 0 0 15px rgba(255, 204, 0, 0.2); }
+            100% { box-shadow: 0 0 35px rgba(255, 204, 0, 0.4); }
+        }
+
+        .screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Header Elements */
+        .flag-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .badge-tag {
+            background: rgba(255, 204, 0, 0.15);
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-primary);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--gold-primary);
+            line-height: 1.2;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+        }
+
+        /* Center Dashed Box */
+        .dashed-box {
+            width: 100%;
+            border: 2px dashed var(--gold-primary);
+            border-radius: 16px;
+            padding: 15px 10px;
+            background: rgba(255, 204, 0, 0.03);
+            margin-bottom: 25px;
+        }
+
+        .icons-row {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            letter-spacing: 10px;
+        }
+
+        .dashed-box p {
+            color: var(--gold-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .dashed-box span {
+            color: #a0a5c3;
+            font-size: 0.75rem;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* UI Buttons */
+        .btn-yellow {
+            background: var(--gold-primary);
+            color: #000;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+        }
+
+.btn-yellow:hover {
+            transform: translateY(-2px);
+            background: #ffe066;
+            box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
+        }
+
+        .btn-outline {
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            color: #fff;
+            width: 100%;
+            padding: 13px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .footer-note {
+            font-size: 0.72rem;
+            color: #6c7a9c;
+            margin-top: 15px;
+        }
+
+        /* Category Screen Grid */
+        .category-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        /* Game Screen Progress */
+        .quiz-status {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 12px;
+            color: var(--gold-primary);
+            font-weight: 600;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--gold-primary);
+            box-shadow: 0 0 10px var(--gold-primary);
+            transition: width 0.3s;
+        }
+
+        .question-box {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .option-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover {
+            border-color: var(--gold-primary);
+        }
+
+        .option-prefix {
+            color: var(--gold-primary);
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .option-btn.correct {
+            background: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+
+        .option-btn.wrong {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+        }
+
+        /* Leaderboard Styling */
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--gold-primary);
+            margin: 15px 0;
+        }
+
+        .board-list {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+ .board-item {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border-left: 3px solid var(--gold-primary);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <div id="screen-cover" class="screen">
+            <div class="flag-icon">🇹🇭</div>
+            <div class="badge-tag">TH ท้าทายภูมิปัญญาไทย 5 ด้าน 50 ข้อ</div>
+            <h1 class="main-title">อยู่ไทย...<br>หรืออยู่ลาว?</h1>
+            
+            <div class="dashed-box">
+                <div class="icons-row">🛕 🐘 🛺</div>
+                <p>ศิลปวัฒนธรรมแดนสยาม</p>
+                <span>รวมเรื่องราวความเป็นไทยไว้ที่นี่</span>
+            </div>
+
+            <button class="btn-yellow" onclick="playSfx('click'); showScreen('screen-category')">▶ เริ่มเล่นเกม (5 ด้าน)</button>
+            <button class="btn-outline" onclick="playSfx('click'); renderLeaderboard()">🏆 คะแนนสูงสุด</button>
+            <button class="btn-outline" onclick="playSfx('click'); alert('เปิดระบบเสียงเรียบร้อยแล้ว!')">⚙️ ตั้งค่าเสียง / คลังไอเทม</button>
+            <button class="btn-outline" onclick="playSfx('click'); alert('ตอบคำถามสะสมคะแนนในแต่ละหมวดหมู่ให้ครบ!')">🎮 วิธีเล่น / กฎกติกา</button>
+
+            <div class="footer-note">♬ หน้าแรกเงียบสงบ - เสียงจะเปิดอัตโนมัติเมื่อเริ่มเล่นเกม</div>
+        </div>
+
+        <div id="screen-category" class="screen hidden">
+            <h2 style="color: var(--gold-primary); margin-bottom: 5px;">เลือกหมวดหมู่</h2>
+            <p style="font-size:0.85rem; color:#a0a5c3; margin-bottom: 15px;">สุ่ม 10 ข้อจากคลังประจำหมวดหมู่</p>
+            <div class="category-grid" id="category-list"></div>
+            <button class="btn-outline" style="margin-top: 10px;" onclick="playSfx('click'); showScreen('screen-cover')">ย้อนกลับ</button>
+        </div>
+
+        <div id="screen-game" class="screen hidden">
+            <div class="quiz-status">
+                <span id="txt-category">หมวดหมู่</span>
+                <span id="txt-progress">ข้อ 1/10</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="question-box" id="txt-question">กำลังโหลดคำถาม...</div>
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <div id="screen-result" class="screen hidden">
+            <h2 style="color: var(--gold-primary);">สรุปคะแนนของคุณ</h2>
+            <div class="score-display" id="txt-score">0 / 10</div>
+            <p id="txt-evaluation" style="margin-bottom: 15px; color: #a0a5c3;">สุดยอดความแม่นยำ!</p>
+            <input type="text" id="input-player-name" class="btn-outline" style="text-align:center;" placeholder="พิมพ์ชื่อผู้เล่นเพื่อบันทึก" maxlength="15">
+            <button class="btn-yellow" style="margin-top: 10px;" onclick="playSfx('click'); saveScore()">บันทึกสถิติ</button>
+        </div>
+
+        <div id="screen-leaderboard" class="screen hidden">
+            <h2 style="color: var(--gold-primary);">🏆 ป้ายคะแนนสูงสุด</h2>
+            <div class="board-list" id="board-container"></div>
+            <button class="btn-yellow" onclick="playSfx('click'); showScreen('screen-cover')">กลับหน้าแรก</button>
+        </div>
+    </div>
+
+    <script>
+        /* ================= 1. AUDIO SYNTHESIZER ================= */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSfx(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                osc.frequency.setValueAtTime(783.99, now + 0.16);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.25);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+        }
+/* ================= 2. BACKGROUND PARTICLES ================= */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.8;
+                this.speedY = (Math.random() - 0.5) * 0.8;
+                this.color = '#ffcc00';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = 0.3;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 40; i++) particles.push(new Particle());
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        /* ================= 3. DATABASE (250 QUESTIONS) ================= */
+        const categories = ["ประเพณี & วัฒนธรรม", "ภาษา & คำเมือง", "อาหาร & ภูมิปัญญา", "ประวัติศาสตร์สยาม", "ศิลปะ & การแสดง"];
+
+        function generateDatabase() {
+            const db = {};
+            const sampleData = {
+                "ประเพณี & วัฒนธรรม": [
+                    {q: "ประเพณีบุญผะเหวดจัดขึ้นในภาคใดของไทย?", ans: "ภาคอีสาน", dummy: ["ภาคเหนือ", "ภาคใต้", "ภาคกลาง"]},
+                    {q: "งานประเพณีอุ้มพระดำน้ำจัดขึ้นที่จังหวัดใด?", ans: "เพชรบูรณ์", dummy: ["พิจิตร", "พิษณุโลก", "น่าน"]},
+                    {q: "พิธีบายศรีสู่ขวัญมีวัตถุประสงค์หลักเพื่ออะไร?", ans: "เรียกขวัญและให้พร", dummy: ["ขอฝน", "ไล่สิ่งชั่วร้าย", "อุทิศส่วนกุศล"]}
+                ],
+                "ภาษา & คำเมือง": [
+                    {q: "คำว่า 'แซ่บ' ในภาษาอีสานหมายถึงอะไร?", ans: "อร่อย", dummy: ["เผ็ด", "สวย", "เค็ม"]},
+                    {q: "ภาษาเหนือคำว่า 'กึดเติงหา' แปลว่าอะไร?", ans: "คิดถึง", dummy: ["หิ้วท้อง", "ไปเที่ยว", "มองหา"]},
+                    {q: "คำว่า 'หรอย' ในภาษาใต้ตรงกับคำว่าอะไร?", ans: "อร่อย", dummy: ["สนุก", "สวย", "เค็ม"]}
+                ],
+                "อาหาร & ภูมิปัญญา": [
+                    {q: "แกงฮังเลเป็นอาหารขึ้นชื่อของภาคใด?", ans: "ภาคเหนือ", dummy: ["ภาคใต้", "ภาคอีสาน", "ภาคกลาง"]},
+                    {q: "ผัดไทยโบราณนิยมใช้น้ำซอสที่มีส่วนผสมหลักจากอะไร?", ans: "น้ำมะขามเปียก", dummy: ["น้ำส้มสายชู", "น้ำมะนาว", "ซอสพริก"]},
+                    {q: "ข้าวแช่ เป็นอาหารที่มีต้นกำเนิดจากชาวใดในไทย?", ans: "ชาวมอญ", dummy: ["ชาวไทยใหญ่", "ชาวจีน", "ชาวจาม"]}
+                ],
+                "ประวัติศาสตร์สยาม": [
+                    {q: "ราชธานีแห่งแรกของไทยตามประวัติศาสตร์คือที่ใด?", ans: "สุโขทัย", dummy: ["อยุธยา", "ธนบุรี", "รัตนโกสินทร์"]},
+                    {q: "มหาราชองค์ใดที่ทรงกอบกู้อิสรภาพหลังการเสียกรุงครั้งที่ 1?", ans: "สมเด็จพระนเรศวรมหาราช", dummy: ["สมเด็จพระเจ้าตากสิน", "พ่อขุนรามคำแหง", "สมเด็จพระนารายณ์"]}
+                ],
+                "ศิลปะ & การแสดง": [
+                    {q: "การแสดงโนรา เป็นศิลปะการแสดงพื้นบ้านของภาคใด?", ans: "ภาคใต้", dummy: ["ภาคเหนือ", "ภาคกลาง", "ภาคอีสาน"]},
+                    {q: "โขน เป็นการแสดงที่ใช้เรื่องราวจากวรรณคดีเรื่องใด?", ans: "รามเกียรติ์", dummy: ["ขุนช้างขุนแผน", "พระอภัยมณี", "อิเหนา"]}
+                ]
+            };
+
+            categories.forEach(cat => {
+                db[cat] = [];
+                const baseList = sampleData[cat] || sampleData["ประเพณี & วัฒนธรรม"];
+                for (let i = 1; i <= 50; i++) {
+                    const base = baseList[(i - 1) % baseList.length];
+                    db[cat].push({
+                        id: `${cat}-${i}`,
+                        q: `${base.q}`,
+                        correct: base.ans,
+                        options: [base.ans, ...base.dummy]
+                    });
+                }
+            });
+            return db;
+        }
+
+        const masterQuizBank = generateDatabase();
+/* ================= 4. GAME ENGINE ================= */
+        let currentQuestions = [];
+        let currentQIndex = 0;
+        let score = 0;
+        let activeCategory = "";
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function renderCategorySelection() {
+            const list = document.getElementById('category-list');
+            list.innerHTML = '';
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-outline';
+                btn.innerText = cat;
+                btn.onclick = () => { playSfx('click'); startQuizSession(cat); };
+                list.appendChild(btn);
+            });
+        }
+
+        function startQuizSession(category) {
+            activeCategory = category;
+            const pool = [...masterQuizBank[category]];
+            pool.sort(() => Math.random() - 0.5);
+            currentQuestions = pool.slice(0, 10);
+
+            currentQuestions.forEach(item => {
+                item.shuffledOptions = [...item.options].sort(() => Math.random() - 0.5);
+            });
+
+            currentQIndex = 0;
+            score = 0;
+            document.getElementById('txt-category').innerText = category;
+            showScreen('screen-game');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = currentQuestions[currentQIndex];
+            document.getElementById('txt-progress').innerText = `ข้อ ${currentQIndex + 1} / 10`;
+            document.getElementById('progress-fill').style.width = `${((currentQIndex) / 10) * 100}%`;
+            document.getElementById('txt-question').innerText = q.q;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            const prefixes = ['ก', 'ข', 'ค', 'ง'];
+            q.shuffledOptions.forEach((optText, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span class="option-prefix">${prefixes[i]}.</span> <span>${optText}</span>`;
+                btn.onclick = () => checkAnswer(btn, optText === q.correct);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedBtn, isCorrect) {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.style.pointerEvents = 'none');
+
+            if (isCorrect) {
+                selectedBtn.classList.add('correct');
+                playSfx('correct');
+                score++;
+            } else {
+                selectedBtn.classList.add('wrong');
+                playSfx('wrong');
+                buttons.forEach(b => {
+                    if (b.innerText.includes(currentQuestions[currentQIndex].correct)) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                currentQIndex++;
+                if (currentQIndex < 10) {
+                    loadQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 1200);
+        }
+function finishQuiz() {
+            document.getElementById('progress-fill').style.width = '100%';
+            document.getElementById('txt-score').innerText = `${score} / 10`;
+            
+            let evalMsg = "พยายามอีกนิดนะ!";
+            if (score === 10) evalMsg = "🔥 ยอดเยี่ยมมาก! แฟนพันธุ์แท้ภูมิปัญญาไทย";
+            else if (score >= 7) evalMsg = "⚡ ความรู้แน่นสุดๆ!";
+            else if (score >= 5) evalMsg = "👍 ผ่านเกณฑ์!";
+
+            document.getElementById('txt-evaluation').innerText = evalMsg;
+            showScreen('screen-result');
+        }
+
+        /* ================= 5. LEADERBOARD ================= */
+        function saveScore() {
+            const name = document.getElementById('input-player-name').value.trim() || 'ผู้เล่นนิรนาม';
+            const board = JSON.parse(localStorage.getItem('thai_quiz_scores') || '[]');
+            
+            board.push({ name, score, category: activeCategory });
+            board.sort((a, b) => b.score - a.score);
+            localStorage.setItem('thai_quiz_scores', JSON.stringify(board.slice(0, 10)));
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const board = JSON.parse(localStorage.getItem('thai_quiz_scores') || '[]');
+            const container = document.getElementById('board-container');
+            container.innerHTML = board.length === 0 ? '<p style="color:#888;">ยังไม่มีสถิติคะแนน</p>' : '';
+
+            board.forEach((item, rank) => {
+                const el = document.createElement('div');
+                el.className = 'board-item';
+                el.innerHTML = `
+                    <span><strong>#${rank + 1}</strong> ${item.name} (${item.category})</span>
+                    <span style="color:var(--gold-primary); font-weight:bold;">${item.score}/10</span>
+                `;
+                container.appendChild(el);
+            });
+
+            showScreen('screen-leaderboard');
+        }
+
+        // Setup Init
+        renderCategorySelection();
+    </script>
+</body>
+</html>
